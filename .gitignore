@@ -1,0 +1,16 @@
+# Fichiers sensibles à ignorer
+.env
+*.pem
+*.pub
+**/*.pem
+
+# Fichiers temporaires Terraform/OpenTofu
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Fichiers Python
+__pycache__/
+venv/
+*.pyc
