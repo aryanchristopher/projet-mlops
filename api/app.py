@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from pydantic import BaseModel
 import joblib
 import os
+
+from prometheus_client import Counter, Histogram, generate_latest
 
 app = FastAPI()
 
@@ -16,6 +18,16 @@ if os.path.exists(MODEL_PATH):
         model = joblib.load(MODEL_PATH)
     except Exception as e:
         print("Erreur lors du chargement du modèle :", e)
+
+# --- METRIQUES PROMETHEUS ---
+PREDICTION_COUNT = Counter(
+    "prediction_requests_total",
+    "Nombre total de requetes sur /predict"
+)
+PREDICTION_LATENCY = Histogram(
+    "prediction_latency_seconds",
+    "Latence des requetes /predict en secondes"
+)
 
 
 class InputData(BaseModel):
@@ -34,20 +46,32 @@ def health():
 
 @app.post("/predict")
 def predict(data: InputData):
-    features = [[data.x1, data.x2, data.x3]]
+    # Incrémenter le compteur d'appels
+    PREDICTION_COUNT.inc()
 
-    # Fallback si pas de modèle réel
-    if model is None:
-        score = data.x1 * 0.5 + data.x2 * 0.3 + data.x3 * 0.2
+    # Mesurer la latence de la prédiction
+    with PREDICTION_LATENCY.time():
+        features = [[data.x1, data.x2, data.x3]]
+
+        # Fallback si pas de modèle réel
+        if model is None:
+            score = data.x1 * 0.5 + data.x2 * 0.3 + data.x3 * 0.2
+            return {
+                "prediction": score,
+                "model": "dummy"
+            }
+
+        # Si modèle réel dispo
+        pred = model.predict(features)[0]
         return {
-            "prediction": score,
-            "model": "dummy"
+            "prediction": float(pred),
+            "model": "mlflow"
         }
 
-    # Si modèle réel dispo
-    pred = model.predict(features)[0]
-    return {
-        "prediction": float(pred),
-        "model": "mlflow"
-    }
+
+@app.get("/metrics")
+def metrics():
+    """Endpoint exposé pour Prometheus"""
+    data = generate_latest()
+    return Response(content=data, media_type="text/plain; version=0.0.4")
 
