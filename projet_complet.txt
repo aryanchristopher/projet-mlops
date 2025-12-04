@@ -1,0 +1,912 @@
+
+
+####################################################
+=== NOM DU FICHIER : ./api/requirements.txt ===
+####################################################
+
+fastapi
+uvicorn
+pydantic==1.10.13
+joblib
+scikit-learn
+prometheus_client
+
+
+####################################################
+=== NOM DU FICHIER : ./api/Dockerfile ===
+####################################################
+
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Copier les fichiers de l'API
+COPY . /app
+
+# Installer les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Exposer le port de l'API
+EXPOSE 5000
+
+# Commande de démarrage
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+
+
+
+####################################################
+=== NOM DU FICHIER : ./api/app.py ===
+####################################################
+
+from fastapi import FastAPI, Response
+from pydantic import BaseModel
+import joblib
+import os
+
+from prometheus_client import Counter, Histogram, generate_latest
+
+app = FastAPI()
+
+# Chemin vers le modèle
+BASE_DIR = os.path.dirname(__file__)
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
+
+# Tenter de charger le modèle
+model = None
+if os.path.exists(MODEL_PATH):
+    try:
+        model = joblib.load(MODEL_PATH)
+    except Exception as e:
+        print("Erreur lors du chargement du modèle :", e)
+
+# --- METRIQUES PROMETHEUS ---
+PREDICTION_COUNT = Counter(
+    "prediction_requests_total",
+    "Nombre total de requetes sur /predict"
+)
+PREDICTION_LATENCY = Histogram(
+    "prediction_latency_seconds",
+    "Latence des requetes /predict en secondes"
+)
+
+
+class InputData(BaseModel):
+    x1: float
+    x2: float
+    x3: float
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None
+    }
+
+
+@app.post("/predict")
+def predict(data: InputData):
+    # Incrémenter le compteur d'appels
+    PREDICTION_COUNT.inc()
+
+    # Mesurer la latence de la prédiction
+    with PREDICTION_LATENCY.time():
+        features = [[data.x1, data.x2, data.x3]]
+
+        # Fallback si pas de modèle réel
+        if model is None:
+            score = data.x1 * 0.5 + data.x2 * 0.3 + data.x3 * 0.2
+            return {
+                "prediction": score,
+                "model": "dummy"
+            }
+
+        # Si modèle réel dispo
+        pred = model.predict(features)[0]
+        return {
+            "prediction": float(pred),
+            "model": "mlflow"
+        }
+
+
+@app.get("/metrics")
+def metrics():
+    """Endpoint exposé pour Prometheus"""
+    data = generate_latest()
+    return Response(content=data, media_type="text/plain; version=0.0.4")
+
+
+
+####################################################
+=== NOM DU FICHIER : ./destroy.sh ===
+####################################################
+
+
+
+####################################################
+=== NOM DU FICHIER : ./ansible/inventory.yml ===
+####################################################
+
+api:
+  hosts:
+    13.39.17.68:
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ./id_rsa.pem
+
+monitoring:
+  hosts:
+    35.180.156.63:
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ./id_rsa.pem
+
+
+####################################################
+=== NOM DU FICHIER : ./ansible/ansible.cfg ===
+####################################################
+
+[defaults]
+# Ne pas vérifier les clés SSH (évite les yes/no)
+host_key_checking = False
+# Augmenter le temps d'attente à 60 secondes (utile en 4G)
+timeout = 60
+
+[ssh_connection]
+# Active le "pipelining" (envoie tout en une seule connexion SSH au lieu de plusieurs)
+# C'est beaucoup plus rapide et stable sur les réseaux mobiles
+pipelining = True
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+
+
+####################################################
+=== NOM DU FICHIER : ./ansible/playbook-monitoring.yml.save ===
+####################################################
+
+- name: Installation Monitoring (Prometheus + Grafana)
+  hosts: monitoring
+  become: yes
+  vars:
+    docker_packages:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-pip # Nécessaire pour installer le module docker python
+
+  tasks:
+    # --- PARTIE 1 : INSTALLATION DOCKER (Comme avant) ---
+    - name: 1. Mise à jour cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: 2. Install pré-requis
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ docker_packages }}"
+
+    - name: 3. Dossier clé GPG
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: 4. Clé GPG Docker
+      shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: 5. Dépôt Docker
+      shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    - name: 6. Install Docker Engine
+      apt:
+        update_cache: yes
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+- name: 8. Installation Librairie Docker pour Python (FIX COMPATIBILITÉ)
+      pip:
+        name:
+          - docker==6.1.3
+          - urllib3==1.26.15
+          - requests==2.28.2
+        executable: pip3
+        state: force_reinstall        state: present
+
+    - name: 7. User ubuntu dans groupe docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    # --- PARTIE 2 : CONFIG PYTHON (Nécessaire pour Ansible Docker) ---
+    - name: 8. Installation Librairie Docker pour Python
+      pip:
+        name: 
+          - docker
+          - urllib3<2.0 # Hack pour compatibilité
+        executable: pip3
+
+    # --- PARTIE 3 : CONFIGURATION & LANCEMENT ---
+    - name: 9. Créer dossier config Prometheus
+      file:
+        path: /etc/prometheus
+        state: directory
+        mode: '0755'
+
+    - name: 10. Copier le fichier de config
+      copy:
+        src: ../monitoring/prometheus.yml
+        dest: /etc/prometheus/prometheus.yml
+
+    - name: 11. Lancer Prometheus (Port 9090)
+      docker_container:
+        name: prometheus
+        image: prom/prometheus
+        state: started
+        restart_policy: always
+        ports:
+          - "9090:9090"
+        volumes:
+          - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    - name: 12. Lancer Grafana (Port 3000)
+      docker_container:
+        name: grafana
+        image: grafana/grafana
+        state: started
+        restart_policy: always
+        ports:
+          - "3000:3000"
+
+
+####################################################
+=== NOM DU FICHIER : ./ansible/playbook-monitoring.yml ===
+####################################################
+
+- name: Installation Monitoring (Prometheus + Grafana)
+  hosts: monitoring
+  become: yes
+  vars:
+    docker_packages:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-pip
+
+  tasks:
+    # --- INSTALLATION DOCKER ---
+    - name: 1. Mise à jour cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: 2. Install pré-requis
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ docker_packages }}"
+
+    - name: 3. Clé GPG Docker
+      shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: 4. Dépôt Docker
+      shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    - name: 5. Install Docker Engine
+      apt:
+        update_cache: yes
+        name: [docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin]
+        state: present
+
+    - name: 6. User ubuntu dans groupe docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    # --- FIX CRITIQUE PYTHON / DOCKER ---
+    - name: 7. Installation Librairie Docker pour Python (FIX COMPATIBILITÉ)
+      pip:
+        name:
+          - docker==6.1.3
+          - urllib3==1.26.15
+          - requests==2.28.2
+        executable: pip3
+        state: forcereinstall
+
+    # --- CONFIGURATION & LANCEMENT ---
+    - name: 8. Créer dossier config Prometheus
+      file:
+        path: /etc/prometheus
+        state: directory
+        mode: '0755'
+
+    - name: 9. Copier le fichier de config (AVEC PERMISSIONS FIXÉES)
+      copy:
+        src: ../monitoring/prometheus.yml
+        dest: /etc/prometheus/prometheus.yml
+        mode: '0644'  # <-- C'est ça qui va réparer ton erreur de chargement
+
+    - name: 10. Lancer Prometheus
+      docker_container:
+        name: prometheus
+        image: prom/prometheus
+        state: started
+        restart_policy: always
+        ports: ["9090:9090"]
+        volumes: ["/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"]
+
+    - name: 11. Lancer Grafana
+      docker_container:
+        name: grafana
+        image: grafana/grafana
+        state: started
+        restart_policy: always
+        ports: ["3000:3000"]
+
+
+####################################################
+=== NOM DU FICHIER : ./ansible/playbook-api.yml ===
+####################################################
+
+- name: Installation de Docker et Setup API
+  hosts: api
+  become: yes
+  vars:
+    docker_packages:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+
+  tasks:
+    - name: 1. Mise à jour du cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: 2. Installation des pré-requis
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ docker_packages }}"
+
+    - name: 3. Création du dossier pour la clé GPG
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: 4. Ajout de la clé GPG officielle Docker
+      shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: 5. Ajout du dépôt Docker
+      shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    - name: 6. Installation de Docker Engine
+      apt:
+        update_cache: yes
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: 7. Ajout de l'utilisateur ubuntu au groupe docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: 8. Démarrage du service Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+
+####################################################
+=== NOM DU FICHIER : ./tofu/main.tf ===
+####################################################
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+# On configure la région Paris (eu-west-3) comme demandé dans le sujet
+provider "aws" {
+  region = "eu-west-3"
+}
+
+# 1. On génère une nouvelle clé SSH sécurisée automatiquement
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# 2. On envoie la partie "publique" de la clé à AWS
+resource "aws_key_pair" "deployer" {
+  key_name   = "mlops-key"
+  public_key = tls_private_key.ssh_key.public_key_openssh
+}
+
+# 3. On sauvegarde la partie "privée" sur ton PC pour qu'Ansible l'utilise
+resource "local_file" "private_key" {
+  content         = tls_private_key.ssh_key.private_key_pem
+  filename        = "${path.module}/../ansible/id_rsa.pem"
+  file_permission = "0600" # Très important : lecture seule pour toi (sécurité Linux)
+}
+
+# Sécurité pour l'API (SSH + HTTP + Exporter metrics)
+resource "aws_security_group" "api_sg" {
+  name        = "mlops-api-sg"
+  description = "Security group for API server"
+
+  # SSH (Port 22)
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # API (Port 5000 - Flask/FastAPI)
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Node Exporter pour Prometheus (Port 9100)
+  ingress {
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Sortie illimitée (pour télécharger des paquets, docker, etc)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Sécurité pour le Monitoring (SSH + Prometheus + Grafana)
+resource "aws_security_group" "monitoring_sg" {
+  name        = "mlops-monitoring-sg"
+  description = "Security group for Monitoring server"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Prometheus UI (Port 9090)
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Grafana UI (Port 3000)
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# --- 1. Trouver automatiquement la dernière version d'Ubuntu ---
+# (C'est une bonne pratique du cours : ne pas mettre l'ID en dur)
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # ID officiel de Canonical (Ubuntu)
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+}
+
+# --- 2. Créer l'Instance API ---
+resource "aws_instance" "api_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro" # Instance gratuite (Free Tier)
+  key_name      = aws_key_pair.deployer.key_name
+  
+  # On attache le Security Group API créé juste avant
+  vpc_security_group_ids = [aws_security_group.api_sg.id]
+
+  tags = {
+    Name = "mlops-api-server"
+  }
+}
+
+# --- 3. Créer l'Instance Monitoring ---
+resource "aws_instance" "monitoring_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+  key_name      = aws_key_pair.deployer.key_name
+
+  # On attache le Security Group Monitoring
+  vpc_security_group_ids = [aws_security_group.monitoring_sg.id]
+
+  tags = {
+    Name = "mlops-monitoring-server"
+  }
+}
+
+# --- 4. Générer l'inventaire Ansible automatiquement ---
+# (Ceci remplit l'exigence "Génération automatique de l'inventaire")
+resource "local_file" "ansible_inventory" {
+  content = <<EOT
+api:
+  hosts:
+    ${aws_instance.api_server.public_ip}:
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ./id_rsa.pem
+
+monitoring:
+  hosts:
+    ${aws_instance.monitoring_server.public_ip}:
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ./id_rsa.pem
+EOT
+  filename = "${path.module}/../ansible/inventory.yml"
+}
+
+
+####################################################
+=== NOM DU FICHIER : ./tofu/outputs.tf ===
+####################################################
+
+
+
+####################################################
+=== NOM DU FICHIER : ./tofu/terraform.tfstate.backup ===
+####################################################
+
+{"version":4,"terraform_version":"1.10.7","serial":1,"lineage":"3f5cbe5d-a10e-d993-bdec-019ded7bfae5","outputs":{},"resources":[{"mode":"data","type":"aws_ami","name":"ubuntu","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":0,"attributes":{"architecture":"x86_64","arn":"arn:aws:ec2:eu-west-3::image/ami-08062446029b25a4e","block_device_mappings":[{"device_name":"/dev/sda1","ebs":{"delete_on_termination":"true","encrypted":"false","iops":"0","snapshot_id":"snap-09105bec82105d332","throughput":"0","volume_initialization_rate":"0","volume_size":"8","volume_type":"gp2"},"no_device":"","virtual_name":""},{"device_name":"/dev/sdb","ebs":{},"no_device":"","virtual_name":"ephemeral0"},{"device_name":"/dev/sdc","ebs":{},"no_device":"","virtual_name":"ephemeral1"}],"boot_mode":"uefi-preferred","creation_date":"2025-11-22T06:49:11.000Z","deprecation_time":"2027-11-22T06:49:11.000Z","description":"Canonical, Ubuntu, 22.04, amd64 jammy image","ena_support":true,"executable_users":null,"filter":[{"name":"name","values":["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]}],"hypervisor":"xen","id":"ami-08062446029b25a4e","image_id":"ami-08062446029b25a4e","image_location":"amazon/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20251122","image_owner_alias":"amazon","image_type":"machine","imds_support":"","include_deprecated":false,"kernel_id":"","last_launched_time":"","most_recent":true,"name":"ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20251122","name_regex":null,"owner_id":"099720109477","owners":["099720109477"],"platform":"","platform_details":"Linux/UNIX","product_codes":[],"public":true,"ramdisk_id":"","root_device_name":"/dev/sda1","root_device_type":"ebs","root_snapshot_id":"snap-09105bec82105d332","sriov_net_support":"simple","state":"available","state_reason":{"code":"UNSET","message":"UNSET"},"tags":{},"timeouts":null,"tpm_support":"","uefi_data":null,"usage_operation":"RunInstances","virtualization_type":"hvm"},"sensitive_attributes":[]}]},{"mode":"managed","type":"local_file","name":"private_key","provider":"provider[\"registry.opentofu.org/hashicorp/local\"]","instances":[{"schema_version":0,"attributes":{"content":"-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n","content_base64":null,"content_base64sha256":"LgoXjWvzM9JsxpWXHgSmj+DS/20oiLzdLBe4aTXTArI=","content_base64sha512":"/ZadOQ5hK5KLY9JT2aFlEfG9g4fgILk7L3xS+E/oOxnx/K37WJ4SA6e55JAJ7N0jWvy5SuJ17cAYxTi5k9eILg==","content_md5":"0c2aaea0c572eeedc120cf16215fc54b","content_sha1":"c604b8160ebea45b8c83a584fc160127162f5434","content_sha256":"2e0a178d6bf333d26cc695971e04a68fe0d2ff6d2888bcdd2c17b86935d302b2","content_sha512":"fd969d390e612b928b63d253d9a16511f1bd8387e020b93b2f7c52f84fe83b19f1fcadfb589e1203a7b9e49009ecdd235afcb94ae275edc018c538b993d7882e","directory_permission":"0777","file_permission":"0600","filename":"./../ansible/id_rsa.pem","id":"c604b8160ebea45b8c83a584fc160127162f5434","sensitive_content":null,"source":null},"sensitive_attributes":[[{"type":"get_attr","value":"sensitive_content"}],[{"type":"get_attr","value":"content"}]],"dependencies":["tls_private_key.ssh_key"]}]},{"mode":"managed","type":"tls_private_key","name":"ssh_key","provider":"provider[\"registry.opentofu.org/hashicorp/tls\"]","instances":[{"schema_version":1,"attributes":{"algorithm":"RSA","ecdsa_curve":"P224","id":"42d7c514cfe9c10573e754ba53669fb14eeefb98","private_key_openssh":"-----BEGIN OPENSSH PRIVATE KEY-----\n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\n-----END OPENSSH PRIVATE KEY-----\n","private_key_pem":"-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n","private_key_pem_pkcs8":"-----BEGIN PRIVATE KEY-----\n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\n4gTARSTCd0ollUwxeQaEzTNS4lRErg==\n-----END PRIVATE KEY-----\n","public_key_fingerprint_md5":"49:07:1c:5c:4c:c0:ae:7d:66:ab:3c:d8:a3:e4:03:33","public_key_fingerprint_sha256":"SHA256:TCOeFf0ASzolThO6loPuTzWn5oYeBHBesAa+Tyl/flk","public_key_openssh":"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCvjjMF8fNflIO7YNWWpalDnz8KEdfCCBK4HbhDpuXZtvHhPu1fksS7dmxgz/9i4GRishehcV/sIHgKuQw95xp9QbDMyqcMlZTo2mhyIYRHiOmniXYzS0oDSXqcTplZn2yrnqRcXdUc2m6zEEeEHZF7hmwKXly0ju6wdy3ANsH7X8s9MJUxEpZTFboqSSZJY1507T7tIELjgX7QmfQrS7bhjE4QjtDEkkg+IGnafYgfYHSJFCcxoPJ7Uc+Np6z1SV29jPKuRyrG7Jk4Vs3hCBolw/PDgzDzuatles2Xq7flnaqIwAlpsbwO3pMRy6r20wZilpk6bwf2780kjlvEBoNLfNkLUoXNke0YU9Z20CYPzxx7pf52EK3cItALtd9X7LbN3T8iSyCKUh2HVhHwW6XWUGx0iTaUkx2t4LtoKHuJcNf3AhnOpQmMK+GPle85jOCom88eUi6HblELApCMoHA2wcKRyx7Ge5ruVE5HXZs7TCIufygavixUZBJ0mIItp7Ix/gKyzUXJA6imaZ9H/BN2EE4azPx71iViXVbSBd6jug7mbVdl1u7H/YKZ83mCxwwrxEy0h48hyEbS/WyzsP1A0Yjy3tLbu/a84wFOe+AZ5LRwAbq3jbLYtEyeXYfpFYhJqKynX6FDP8Em1BeOPKV4EQuXn/uSQTN1LyTTpC1Fw==\n","public_key_pem":"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwr44zBfHzX5SDu2DVlqW\npQ58/ChHXwggSuB24Q6bl2bbx4T7tX5LEu3ZsYM//YuBkYrIXoXFf7CB4CrkMPec\nafUGwzMqnDJWU6NpociGER4jpp4l2M0tKA0l6nE6ZWZ9sq56kXF3VHNpusxBHhB2\nRe4ZsCl5ctI7usHctwDbB+1/LPTCVMRKWUxW6KkkmSWNedO0+7SBC44F+0Jn0K0u\n24YxOEI7QxJJIPiBp2n2IH2B0iRQnMaDye1HPjaes9UldvYzyrkcqxuyZOFbN4Qg\naJcPzw4Mw87mrZXrNl6u35Z2qiMAJabG8Dt6TEcuq9tMGYpaZOm8H9u/NJI5bxAa\nDS3zZC1KFzZHtGFPWdtAmD88ce6X+dhCt3CLQC7XfV+y2zd0/IksgilIdh1YR8Fu\nl1lBsdIk2lJMdreC7aCh7iXDX9wIZzqUJjCvhj5XvOYzgqJvPHlIuh25RCwKQjKB\nwNsHCkcsexnua7lROR12bO0wiLn8oGr4sVGQSdJiCLaeyMf4Css1FyQOopmmfR/w\nTdhBOGsz8e9YlYl1W0gXeo7oO5m1XZdbux/2CmfN5gscMK8RMtIePIchG0v1ss7D\n9QNGI8t7S27v2vOMBTnvgGeS0cAG6t42y2LRMnl2H6RWISaisp1+hQz/BJtQXjjy\nleBELl5/7kkEzdS8k06QtRcCAwEAAQ==\n-----END PUBLIC KEY-----\n","rsa_bits":4096},"sensitive_attributes":[[{"type":"get_attr","value":"private_key_openssh"}],[{"type":"get_attr","value":"private_key_pem"}],[{"type":"get_attr","value":"private_key_pem_pkcs8"}]]}]}],"check_results":null}
+
+
+####################################################
+=== NOM DU FICHIER : ./tofu/terraform.tfstate ===
+####################################################
+
+{"version":4,"terraform_version":"1.10.7","serial":2,"lineage":"3f5cbe5d-a10e-d993-bdec-019ded7bfae5","outputs":{},"resources":[{"mode":"data","type":"aws_ami","name":"ubuntu","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":0,"attributes":{"architecture":"x86_64","arn":"arn:aws:ec2:eu-west-3::image/ami-08062446029b25a4e","block_device_mappings":[{"device_name":"/dev/sda1","ebs":{"delete_on_termination":"true","encrypted":"false","iops":"0","snapshot_id":"snap-09105bec82105d332","throughput":"0","volume_initialization_rate":"0","volume_size":"8","volume_type":"gp2"},"no_device":"","virtual_name":""},{"device_name":"/dev/sdb","ebs":{},"no_device":"","virtual_name":"ephemeral0"},{"device_name":"/dev/sdc","ebs":{},"no_device":"","virtual_name":"ephemeral1"}],"boot_mode":"uefi-preferred","creation_date":"2025-11-22T06:49:11.000Z","deprecation_time":"2027-11-22T06:49:11.000Z","description":"Canonical, Ubuntu, 22.04, amd64 jammy image","ena_support":true,"executable_users":null,"filter":[{"name":"name","values":["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]}],"hypervisor":"xen","id":"ami-08062446029b25a4e","image_id":"ami-08062446029b25a4e","image_location":"amazon/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20251122","image_owner_alias":"amazon","image_type":"machine","imds_support":"","include_deprecated":false,"kernel_id":"","last_launched_time":"","most_recent":true,"name":"ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20251122","name_regex":null,"owner_id":"099720109477","owners":["099720109477"],"platform":"","platform_details":"Linux/UNIX","product_codes":[],"public":true,"ramdisk_id":"","root_device_name":"/dev/sda1","root_device_type":"ebs","root_snapshot_id":"snap-09105bec82105d332","sriov_net_support":"simple","state":"available","state_reason":{"code":"UNSET","message":"UNSET"},"tags":{},"timeouts":null,"tpm_support":"","uefi_data":null,"usage_operation":"RunInstances","virtualization_type":"hvm"},"sensitive_attributes":[]}]},{"mode":"managed","type":"aws_instance","name":"api_server","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":1,"attributes":{"ami":"ami-08062446029b25a4e","arn":"arn:aws:ec2:eu-west-3:767163337785:instance/i-0ed3582ef1a29d686","associate_public_ip_address":true,"availability_zone":"eu-west-3c","capacity_reservation_specification":[{"capacity_reservation_preference":"open","capacity_reservation_target":[]}],"cpu_core_count":1,"cpu_options":[{"amd_sev_snp":"","core_count":1,"threads_per_core":2}],"cpu_threads_per_core":2,"credit_specification":[{"cpu_credits":"unlimited"}],"disable_api_stop":false,"disable_api_termination":false,"ebs_block_device":[],"ebs_optimized":false,"enable_primary_ipv6":null,"enclave_options":[{"enabled":false}],"ephemeral_block_device":[],"get_password_data":false,"hibernation":false,"host_id":"","host_resource_group_arn":null,"iam_instance_profile":"","id":"i-0ed3582ef1a29d686","instance_initiated_shutdown_behavior":"stop","instance_lifecycle":"","instance_market_options":[],"instance_state":"running","instance_type":"t3.micro","ipv6_address_count":0,"ipv6_addresses":[],"key_name":"mlops-key","launch_template":[],"maintenance_options":[{"auto_recovery":"default"}],"metadata_options":[{"http_endpoint":"enabled","http_protocol_ipv6":"disabled","http_put_response_hop_limit":1,"http_tokens":"optional","instance_metadata_tags":"disabled"}],"monitoring":false,"network_interface":[],"outpost_arn":"","password_data":"","placement_group":"","placement_partition_number":0,"primary_network_interface_id":"eni-069077ef21a0949c9","private_dns":"ip-172-31-33-36.eu-west-3.compute.internal","private_dns_name_options":[{"enable_resource_name_dns_a_record":false,"enable_resource_name_dns_aaaa_record":false,"hostname_type":"ip-name"}],"private_ip":"172.31.33.36","public_dns":"ec2-13-39-17-68.eu-west-3.compute.amazonaws.com","public_ip":"13.39.17.68","root_block_device":[{"delete_on_termination":true,"device_name":"/dev/sda1","encrypted":false,"iops":100,"kms_key_id":"","tags":{},"tags_all":{},"throughput":0,"volume_id":"vol-07f7de86648293c15","volume_size":8,"volume_type":"gp2"}],"secondary_private_ips":[],"security_groups":["mlops-api-sg"],"source_dest_check":true,"spot_instance_request_id":"","subnet_id":"subnet-0bb389ba6e5db6bad","tags":{"Name":"mlops-api-server"},"tags_all":{"Name":"mlops-api-server"},"tenancy":"default","timeouts":null,"user_data":null,"user_data_base64":null,"user_data_replace_on_change":false,"volume_tags":null,"vpc_security_group_ids":["sg-0bc94b6ba90f5fa61"]},"sensitive_attributes":[],"private":"eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMCwicmVhZCI6OTAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9","dependencies":["aws_key_pair.deployer","aws_security_group.api_sg","data.aws_ami.ubuntu","tls_private_key.ssh_key"]}]},{"mode":"managed","type":"aws_instance","name":"monitoring_server","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":1,"attributes":{"ami":"ami-08062446029b25a4e","arn":"arn:aws:ec2:eu-west-3:767163337785:instance/i-0e4178315dbd17e28","associate_public_ip_address":true,"availability_zone":"eu-west-3c","capacity_reservation_specification":[{"capacity_reservation_preference":"open","capacity_reservation_target":[]}],"cpu_core_count":1,"cpu_options":[{"amd_sev_snp":"","core_count":1,"threads_per_core":2}],"cpu_threads_per_core":2,"credit_specification":[{"cpu_credits":"unlimited"}],"disable_api_stop":false,"disable_api_termination":false,"ebs_block_device":[],"ebs_optimized":false,"enable_primary_ipv6":null,"enclave_options":[{"enabled":false}],"ephemeral_block_device":[],"get_password_data":false,"hibernation":false,"host_id":"","host_resource_group_arn":null,"iam_instance_profile":"","id":"i-0e4178315dbd17e28","instance_initiated_shutdown_behavior":"stop","instance_lifecycle":"","instance_market_options":[],"instance_state":"running","instance_type":"t3.micro","ipv6_address_count":0,"ipv6_addresses":[],"key_name":"mlops-key","launch_template":[],"maintenance_options":[{"auto_recovery":"default"}],"metadata_options":[{"http_endpoint":"enabled","http_protocol_ipv6":"disabled","http_put_response_hop_limit":1,"http_tokens":"optional","instance_metadata_tags":"disabled"}],"monitoring":false,"network_interface":[],"outpost_arn":"","password_data":"","placement_group":"","placement_partition_number":0,"primary_network_interface_id":"eni-0ad8f6f8327f8f1d2","private_dns":"ip-172-31-40-34.eu-west-3.compute.internal","private_dns_name_options":[{"enable_resource_name_dns_a_record":false,"enable_resource_name_dns_aaaa_record":false,"hostname_type":"ip-name"}],"private_ip":"172.31.40.34","public_dns":"ec2-35-180-156-63.eu-west-3.compute.amazonaws.com","public_ip":"35.180.156.63","root_block_device":[{"delete_on_termination":true,"device_name":"/dev/sda1","encrypted":false,"iops":100,"kms_key_id":"","tags":{},"tags_all":{},"throughput":0,"volume_id":"vol-0cf95f4f02dc40fb2","volume_size":8,"volume_type":"gp2"}],"secondary_private_ips":[],"security_groups":["mlops-monitoring-sg"],"source_dest_check":true,"spot_instance_request_id":"","subnet_id":"subnet-0bb389ba6e5db6bad","tags":{"Name":"mlops-monitoring-server"},"tags_all":{"Name":"mlops-monitoring-server"},"tenancy":"default","timeouts":null,"user_data":null,"user_data_base64":null,"user_data_replace_on_change":false,"volume_tags":null,"vpc_security_group_ids":["sg-0d4758ff5456235c6"]},"sensitive_attributes":[],"private":"eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMCwicmVhZCI6OTAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9","dependencies":["aws_key_pair.deployer","aws_security_group.monitoring_sg","data.aws_ami.ubuntu","tls_private_key.ssh_key"]}]},{"mode":"managed","type":"aws_key_pair","name":"deployer","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":1,"attributes":{"arn":"arn:aws:ec2:eu-west-3:767163337785:key-pair/mlops-key","fingerprint":"2c:83:0b:ee:18:bf:69:a6:a7:57:78:4f:3d:b2:62:9f","id":"mlops-key","key_name":"mlops-key","key_name_prefix":"","key_pair_id":"key-0157c03fc37e87ed4","key_type":"rsa","public_key":"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCvjjMF8fNflIO7YNWWpalDnz8KEdfCCBK4HbhDpuXZtvHhPu1fksS7dmxgz/9i4GRishehcV/sIHgKuQw95xp9QbDMyqcMlZTo2mhyIYRHiOmniXYzS0oDSXqcTplZn2yrnqRcXdUc2m6zEEeEHZF7hmwKXly0ju6wdy3ANsH7X8s9MJUxEpZTFboqSSZJY1507T7tIELjgX7QmfQrS7bhjE4QjtDEkkg+IGnafYgfYHSJFCcxoPJ7Uc+Np6z1SV29jPKuRyrG7Jk4Vs3hCBolw/PDgzDzuatles2Xq7flnaqIwAlpsbwO3pMRy6r20wZilpk6bwf2780kjlvEBoNLfNkLUoXNke0YU9Z20CYPzxx7pf52EK3cItALtd9X7LbN3T8iSyCKUh2HVhHwW6XWUGx0iTaUkx2t4LtoKHuJcNf3AhnOpQmMK+GPle85jOCom88eUi6HblELApCMoHA2wcKRyx7Ge5ruVE5HXZs7TCIufygavixUZBJ0mIItp7Ix/gKyzUXJA6imaZ9H/BN2EE4azPx71iViXVbSBd6jug7mbVdl1u7H/YKZ83mCxwwrxEy0h48hyEbS/WyzsP1A0Yjy3tLbu/a84wFOe+AZ5LRwAbq3jbLYtEyeXYfpFYhJqKynX6FDP8Em1BeOPKV4EQuXn/uSQTN1LyTTpC1Fw==","tags":null,"tags_all":{}},"sensitive_attributes":[],"private":"eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==","dependencies":["tls_private_key.ssh_key"]}]},{"mode":"managed","type":"aws_security_group","name":"api_sg","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":1,"attributes":{"arn":"arn:aws:ec2:eu-west-3:767163337785:security-group/sg-0bc94b6ba90f5fa61","description":"Security group for API server","egress":[{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":0,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"-1","security_groups":[],"self":false,"to_port":0}],"id":"sg-0bc94b6ba90f5fa61","ingress":[{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":22,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"tcp","security_groups":[],"self":false,"to_port":22},{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":5000,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"tcp","security_groups":[],"self":false,"to_port":5000},{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":9100,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"tcp","security_groups":[],"self":false,"to_port":9100}],"name":"mlops-api-sg","name_prefix":"","owner_id":"767163337785","revoke_rules_on_delete":false,"tags":null,"tags_all":{},"timeouts":null,"vpc_id":"vpc-0bbdfa6a29d2e7bb0"},"sensitive_attributes":[],"private":"eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0="}]},{"mode":"managed","type":"aws_security_group","name":"monitoring_sg","provider":"provider[\"registry.opentofu.org/hashicorp/aws\"]","instances":[{"schema_version":1,"attributes":{"arn":"arn:aws:ec2:eu-west-3:767163337785:security-group/sg-0d4758ff5456235c6","description":"Security group for Monitoring server","egress":[{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":0,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"-1","security_groups":[],"self":false,"to_port":0}],"id":"sg-0d4758ff5456235c6","ingress":[{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":22,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"tcp","security_groups":[],"self":false,"to_port":22},{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":3000,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"tcp","security_groups":[],"self":false,"to_port":3000},{"cidr_blocks":["0.0.0.0/0"],"description":"","from_port":9090,"ipv6_cidr_blocks":[],"prefix_list_ids":[],"protocol":"tcp","security_groups":[],"self":false,"to_port":9090}],"name":"mlops-monitoring-sg","name_prefix":"","owner_id":"767163337785","revoke_rules_on_delete":false,"tags":null,"tags_all":{},"timeouts":null,"vpc_id":"vpc-0bbdfa6a29d2e7bb0"},"sensitive_attributes":[],"private":"eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0="}]},{"mode":"managed","type":"local_file","name":"ansible_inventory","provider":"provider[\"registry.opentofu.org/hashicorp/local\"]","instances":[{"schema_version":0,"attributes":{"content":"api:\n  hosts:\n    13.39.17.68:\n      ansible_user: ubuntu\n      ansible_ssh_private_key_file: ./id_rsa.pem\n\nmonitoring:\n  hosts:\n    35.180.156.63:\n      ansible_user: ubuntu\n      ansible_ssh_private_key_file: ./id_rsa.pem\n","content_base64":null,"content_base64sha256":"n8zNvvHtJBFmusIxQFlhpBhPC2FWrOv15Zh00bm9Emk=","content_base64sha512":"2Po6xI66zztgtVjSzC/pBAKGppGAcqt2FoPYPruXKv/01hDIzn4oJhlkk3cQmpn3Y/32+N17z1IIf6xLQEDfeA==","content_md5":"d5c2c5067c1b7d9553d16a318d8bde99","content_sha1":"45dcea82e5f388a59df3db8142443d28ae4b49c0","content_sha256":"9fcccdbef1ed241166bac231405961a4184f0b6156acebf5e59874d1b9bd1269","content_sha512":"d8fa3ac48ebacf3b60b558d2cc2fe9040286a6918072ab761683d83ebb972afff4d610c8ce7e282619649377109a99f763fdf6f8dd7bcf52087fac4b4040df78","directory_permission":"0777","file_permission":"0777","filename":"./../ansible/inventory.yml","id":"45dcea82e5f388a59df3db8142443d28ae4b49c0","sensitive_content":null,"source":null},"sensitive_attributes":[[{"type":"get_attr","value":"sensitive_content"}]],"dependencies":["aws_instance.api_server","aws_instance.monitoring_server","aws_key_pair.deployer","aws_security_group.api_sg","aws_security_group.monitoring_sg","data.aws_ami.ubuntu","tls_private_key.ssh_key"]}]},{"mode":"managed","type":"local_file","name":"private_key","provider":"provider[\"registry.opentofu.org/hashicorp/local\"]","instances":[{"schema_version":0,"attributes":{"content":"-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n","content_base64":null,"content_base64sha256":"LgoXjWvzM9JsxpWXHgSmj+DS/20oiLzdLBe4aTXTArI=","content_base64sha512":"/ZadOQ5hK5KLY9JT2aFlEfG9g4fgILk7L3xS+E/oOxnx/K37WJ4SA6e55JAJ7N0jWvy5SuJ17cAYxTi5k9eILg==","content_md5":"0c2aaea0c572eeedc120cf16215fc54b","content_sha1":"c604b8160ebea45b8c83a584fc160127162f5434","content_sha256":"2e0a178d6bf333d26cc695971e04a68fe0d2ff6d2888bcdd2c17b86935d302b2","content_sha512":"fd969d390e612b928b63d253d9a16511f1bd8387e020b93b2f7c52f84fe83b19f1fcadfb589e1203a7b9e49009ecdd235afcb94ae275edc018c538b993d7882e","directory_permission":"0777","file_permission":"0600","filename":"./../ansible/id_rsa.pem","id":"c604b8160ebea45b8c83a584fc160127162f5434","sensitive_content":null,"source":null},"sensitive_attributes":[[{"type":"get_attr","value":"sensitive_content"}],[{"type":"get_attr","value":"content"}]],"dependencies":["tls_private_key.ssh_key"]}]},{"mode":"managed","type":"tls_private_key","name":"ssh_key","provider":"provider[\"registry.opentofu.org/hashicorp/tls\"]","instances":[{"schema_version":1,"attributes":{"algorithm":"RSA","ecdsa_curve":"P224","id":"42d7c514cfe9c10573e754ba53669fb14eeefb98","private_key_openssh":"-----BEGIN OPENSSH PRIVATE KEY-----\n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\n-----END OPENSSH PRIVATE KEY-----\n","private_key_pem":"-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n","private_key_pem_pkcs8":"-----BEGIN PRIVATE KEY-----\nMIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQDCvjjMF8fNflIO\n7YNWWpalDnz8KEdfCCBK4HbhDpuXZtvHhPu1fksS7dmxgz/9i4GRishehcV/sIHg\nKuQw95xp9QbDMyqcMlZTo2mhyIYRHiOmniXYzS0oDSXqcTplZn2yrnqRcXdUc2m6\nzEEeEHZF7hmwKXly0ju6wdy3ANsH7X8s9MJUxEpZTFboqSSZJY1507T7tIELjgX7\nQmfQrS7bhjE4QjtDEkkg+IGnafYgfYHSJFCcxoPJ7Uc+Np6z1SV29jPKuRyrG7Jk\n4Vs3hCBolw/PDgzDzuatles2Xq7flnaqIwAlpsbwO3pMRy6r20wZilpk6bwf2780\nkjlvEBoNLfNkLUoXNke0YU9Z20CYPzxx7pf52EK3cItALtd9X7LbN3T8iSyCKUh2\nHVhHwW6XWUGx0iTaUkx2t4LtoKHuJcNf3AhnOpQmMK+GPle85jOCom88eUi6HblE\nLApCMoHA2wcKRyx7Ge5ruVE5HXZs7TCIufygavixUZBJ0mIItp7Ix/gKyzUXJA6i\nmaZ9H/BN2EE4azPx71iViXVbSBd6jug7mbVdl1u7H/YKZ83mCxwwrxEy0h48hyEb\nS/WyzsP1A0Yjy3tLbu/a84wFOe+AZ5LRwAbq3jbLYtEyeXYfpFYhJqKynX6FDP8E\nm1BeOPKV4EQuXn/uSQTN1LyTTpC1FwIDAQABAoICABofWBEQc42+DxXPiFmSBzkW\ny28rm/9EYMiKeYfQ5NAXTQ3jabw7t6hPXW8xUukYyIWUXzJGsWpia9l9B2UGIeYY\npxKSD3oqSmgnuGiqNEmhiFi2SA9f3lnMAbUEAThO2jeYrfpKhR4/6QPUmDuHK8ZP\nnQSDW7YqOzbfAFNP+xGCKxgFsPeb6Pk3g0TsQ2uDnQmle1Z0LQc2wtikXLaiNHHf\n+0Q3pilmD4crroCddxV+oGZm1qVg/5abjH3s57bptX/SoLnlwNG3AmQD0q+Muqgs\n80Lr+IxfeZP5UzbU1pJJZZuG3GMwjuj0oYAP4FPPM9MNOvjkXYbMfEZ6AthCCaxU\n0US1aFUEfRBMAQOXU3vxXUI5jC5uufM90EKuXnZI1XBqz95dkrmyx/+7rwC2f5DH\nLYIjiz/DEfDYgJ3ZNBHpkxiw+e1lHh5p66WeipFuv9MdZZqlUH4T9ckT44ULZQvp\nbZ1IltYEjJEJ3vyr+F26cNLdlln7WBZSswcSVlZQ1uPxJ6HcZ3vcmVifKZaZ3yWs\no6J8KgOU+hJ+m9zo56bXYS18nc3/+UDyuISTc8T6QMQoz7UTEtQxfQb3CDLErDuH\n3hy3xGFDAsuzXmLQjxy2BQvcSbCd4WbotgalaW5czu4wqsNu/q9kOWN6HBdbAfun\nNQfe9U6aW9h8qzPja7MxAoIBAQDxwlFvtuen6W0Rh0lD2UjZGnQJo/8ffC51KzAK\nPrCIZx3Jy7LG/j8Y4Gkp+9JYSceLSR8rp+xtAEyRuD6prvgMkfiNvS0wR3r+sfwk\nmHK6/hUvBedL62ZcLJEHCfuV8dePA8LXwYta3oBwyeMlkB4Y85x7/sst9mk/owh6\n6kgzJV4ScRMhpm7zUv/kw2eHXqK8swoBCkvcdzIfAnx+eJbMRmZuEAqj6H6ru3eD\nO/r+N9GPVAGXqeYPUa0kWdFnj9cUEF0sqmSTc2zVLq7EH4DMxla+4xs5nKgS8704\n62pevsNNmj8qwqI57R9PZvHi/yjRgNDTarLsIzMa9bDFz2QZAoIBAQDONulAwzGD\nLv4ok3SccHI7UcpxmBqrfD/Hhpq9Ntkmgx7FgpTghZZGubCltDeDwIMUOxq61QKt\ntvtWd9MqumBewxYsaJHPBh95GfIOU5Ky/bHKZzSm2iCFAvynlwkcdSP2F2jrCBVN\nAi+lXVtqSNxy16HTqmK3Kw9oSd2fLh2qX59Mu/d1GdEpJ9AA6kFDfFYNZMwUeZ8d\nOnRufG+VGYY5RPELhGZSm/L7trxckPlKK2KLHGQjP4FLmUCqnj69HA6sGOZz6xwM\nq1KnK8xQMNEfzM3mvZI1+Ng018xW4AnNX14XrEfy63U+9+3Bkm0XClMifK/tEaI6\nEah0p0XRToivAoIBAGdhmiN0iqFyH1LkkD70VsOIHWDWAU38c31lR3jKEAF0Xveh\nJMUVifPgWvg6GFvqyOrWDP9FIsQF4bhammlDSg1OCoTKBd3kY0Mw50ra6gzuhC6E\njsEXW8FEyYvCCBS5w10D1bkfqbDk/vW8T2cLtuMioaMgdNAl1CIDXKf7MX61lwG5\n2t2D52Qj9QtlSAtKO7sHsNp7Ba+0RPmfvY7zkECwRjMApxwqWqijVNsIti8pvXJW\nEQxC+f9JBQpLYlGv3+BTkxR7lOC89ig/ezqg4hovIn8kbMr5I6JfGmaRvP3hA3FW\n6XYmnuq4bLAurHdOd60HMcWGlhaGgt8fe0VLh1kCggEBALlf/3sqfT3yZqPPOorP\nQsE0m4pWM9NolGUnCb+CqN7IDEd9RZw4OolFsBil0ynrS2pKX5MInanPzk1C1l+Y\nv70wHqS5NCoo1O4mdsSOOFgTW1oaQOilOYqYzstRKO2eGD/Hd5eg4pUhm/dJ3z3C\nVfofAeinSKpkWStlC4dnC1/3KdrvNlrcZHxcv82yyAyEn07XB+Z4FqNNwxD3Z89e\n7Jxa711tHhaw/lNtSBLmeFNGgQWQ9iwBkJeHIuy96KRTrpTipXgbKFHzSQ/ifX6x\nA61UjNwaGm/OTX3jaFvIdsdaLdmWE++53uJGOkNDADIwI9/iurugmHcfHJIRNOAd\nex0CggEAQSDJYCiEl206xCmkJK1lRi79OuANLMOhQF5iU2EVLgxBSiSmfqiAG8jx\nqPmIWJf7zHeNUO4LfpkobUp5m5P7vUTOfuHsh5BDVScUpZjS1qJ6XjIKY0NxF2Ai\n+4kBWE2sA5pJrR7fL2uepeNN3oo4tAH38WdlCT9s9q5+izEKV4Hn+/KHEhq+nQeQ\nS5k6XJbVJt3n0rtJU/aRLmWMRK3dO9h4vaJvFpEsCF2WcT0uuNbNG+A9yAarcQv5\nhbHVqJuXfC3atRiL78jnnCtTispqB2K7mHVbdQMZZXRdu+NOTosMkBsCwVc9P78m\n4gTARSTCd0ollUwxeQaEzTNS4lRErg==\n-----END PRIVATE KEY-----\n","public_key_fingerprint_md5":"49:07:1c:5c:4c:c0:ae:7d:66:ab:3c:d8:a3:e4:03:33","public_key_fingerprint_sha256":"SHA256:TCOeFf0ASzolThO6loPuTzWn5oYeBHBesAa+Tyl/flk","public_key_openssh":"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCvjjMF8fNflIO7YNWWpalDnz8KEdfCCBK4HbhDpuXZtvHhPu1fksS7dmxgz/9i4GRishehcV/sIHgKuQw95xp9QbDMyqcMlZTo2mhyIYRHiOmniXYzS0oDSXqcTplZn2yrnqRcXdUc2m6zEEeEHZF7hmwKXly0ju6wdy3ANsH7X8s9MJUxEpZTFboqSSZJY1507T7tIELjgX7QmfQrS7bhjE4QjtDEkkg+IGnafYgfYHSJFCcxoPJ7Uc+Np6z1SV29jPKuRyrG7Jk4Vs3hCBolw/PDgzDzuatles2Xq7flnaqIwAlpsbwO3pMRy6r20wZilpk6bwf2780kjlvEBoNLfNkLUoXNke0YU9Z20CYPzxx7pf52EK3cItALtd9X7LbN3T8iSyCKUh2HVhHwW6XWUGx0iTaUkx2t4LtoKHuJcNf3AhnOpQmMK+GPle85jOCom88eUi6HblELApCMoHA2wcKRyx7Ge5ruVE5HXZs7TCIufygavixUZBJ0mIItp7Ix/gKyzUXJA6imaZ9H/BN2EE4azPx71iViXVbSBd6jug7mbVdl1u7H/YKZ83mCxwwrxEy0h48hyEbS/WyzsP1A0Yjy3tLbu/a84wFOe+AZ5LRwAbq3jbLYtEyeXYfpFYhJqKynX6FDP8Em1BeOPKV4EQuXn/uSQTN1LyTTpC1Fw==\n","public_key_pem":"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwr44zBfHzX5SDu2DVlqW\npQ58/ChHXwggSuB24Q6bl2bbx4T7tX5LEu3ZsYM//YuBkYrIXoXFf7CB4CrkMPec\nafUGwzMqnDJWU6NpociGER4jpp4l2M0tKA0l6nE6ZWZ9sq56kXF3VHNpusxBHhB2\nRe4ZsCl5ctI7usHctwDbB+1/LPTCVMRKWUxW6KkkmSWNedO0+7SBC44F+0Jn0K0u\n24YxOEI7QxJJIPiBp2n2IH2B0iRQnMaDye1HPjaes9UldvYzyrkcqxuyZOFbN4Qg\naJcPzw4Mw87mrZXrNl6u35Z2qiMAJabG8Dt6TEcuq9tMGYpaZOm8H9u/NJI5bxAa\nDS3zZC1KFzZHtGFPWdtAmD88ce6X+dhCt3CLQC7XfV+y2zd0/IksgilIdh1YR8Fu\nl1lBsdIk2lJMdreC7aCh7iXDX9wIZzqUJjCvhj5XvOYzgqJvPHlIuh25RCwKQjKB\nwNsHCkcsexnua7lROR12bO0wiLn8oGr4sVGQSdJiCLaeyMf4Css1FyQOopmmfR/w\nTdhBOGsz8e9YlYl1W0gXeo7oO5m1XZdbux/2CmfN5gscMK8RMtIePIchG0v1ss7D\n9QNGI8t7S27v2vOMBTnvgGeS0cAG6t42y2LRMnl2H6RWISaisp1+hQz/BJtQXjjy\nleBELl5/7kkEzdS8k06QtRcCAwEAAQ==\n-----END PUBLIC KEY-----\n","rsa_bits":4096},"sensitive_attributes":[[{"type":"get_attr","value":"private_key_pem_pkcs8"}],[{"type":"get_attr","value":"private_key_openssh"}],[{"type":"get_attr","value":"private_key_pem"}]]}]}],"check_results":null}
+
+
+####################################################
+=== NOM DU FICHIER : ./tofu/variables.tf ===
+####################################################
+
+
+
+####################################################
+=== NOM DU FICHIER : ./monitoring/prometheus.yml ===
+####################################################
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:5000"]
+
+
+
+####################################################
+=== NOM DU FICHIER : ./README.md ===
+####################################################
+
+
+
+####################################################
+=== NOM DU FICHIER : ./deploy.sh ===
+####################################################
+
+
+
+####################################################
+=== NOM DU FICHIER : ./mlflow/requirements.txt ===
+####################################################
+
+mlflow
+scikit-learn
+pandas
+numpy
+
+
+####################################################
+=== NOM DU FICHIER : ./mlflow/train.py ===
+####################################################
+
+import mlflow
+import mlflow.sklearn
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import accuracy_score
+import pandas as pd
+from itertools import product
+
+
+def load_data(test_size=0.2, random_state=42):
+    """
+    Charge le dataset de cancer du sein et split en train/test.
+    """
+    data = load_breast_cancer()
+    X = pd.DataFrame(data.data, columns=data.feature_names)
+    y = pd.Series(data.target, name="target")
+    return train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+
+
+def build_model(model_name: str, params: dict):
+    """
+    Crée un modèle sklearn en fonction du nom et des paramètres.
+    """
+    if model_name == "logreg":
+        return LogisticRegression(**params)
+    elif model_name == "random_forest":
+        return RandomForestClassifier(**params)
+    elif model_name == "gradient_boosting":
+        return GradientBoostingClassifier(**params)
+    else:
+        raise ValueError(f"Modèle non supporté : {model_name}")
+
+
+def train_one_run(model_name: str, params: dict):
+    """
+    Entraîne UN modèle avec les paramètres donnés,
+    log dans MLflow et renvoie l'accuracy.
+    """
+    X_train, X_test, y_train, y_test = load_data()
+
+    with mlflow.start_run():
+        # Log du type de modèle
+        mlflow.log_param("model_name", model_name)
+
+        # Log de tous les hyperparamètres
+        for k, v in params.items():
+            mlflow.log_param(k, v)
+
+        # Création + entraînement du modèle
+        model = build_model(model_name, params)
+        model.fit(X_train, y_train)
+
+        # Prédictions + métrique
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        mlflow.log_metric("val_accuracy", accuracy)
+
+        # Log du modèle lui-même
+        mlflow.sklearn.log_model(model, artifact_path="model")
+
+        print(f"[MLflow] Run – model={model_name}, "
+              f"params={params}, val_accuracy={accuracy:.4f}")
+
+        return accuracy
+
+
+def generate_param_grid(param_grid: dict):
+    """
+    Prend un dict {param: [val1, val2, ...]} et génère toutes les combinaisons possibles.
+    Retourne une liste de dicts (une config par dict).
+    """
+    keys = list(param_grid.keys())
+    values = list(param_grid.values())
+
+    combos = []
+    for combo in product(*values):
+        params = dict(zip(keys, combo))
+        combos.append(params)
+    return combos
+
+
+def run_experiments():
+    """
+    Lance beaucoup d'expériences (plusieurs modèles x beaucoup de paramètres).
+    On vise > 100 runs au total.
+    """
+    mlflow.set_experiment("breast_cancer_multi_models")
+
+    # ===============================
+    # 1) Grilles d'hyperparamètres
+    # ===============================
+
+    # ----- Régression logistique -----
+    logreg_fixed = {
+        "solver": "lbfgs",
+        "penalty": "l2",
+    }
+    logreg_grid = {
+        "C": [0.001, 0.01, 0.1, 1.0, 10.0],
+        "max_iter": [200, 500],
+        "fit_intercept": [True, False],
+    }
+    logreg_param_combos = [
+        {**logreg_fixed, **p} for p in generate_param_grid(logreg_grid)
+    ]
+    # 5 * 2 * 2 = 20 runs
+
+    # ----- Random Forest -----
+    rf_fixed = {
+        "criterion": "gini",
+        "n_jobs": -1,
+    }
+    rf_grid = {
+        "n_estimators": [50, 100, 200, 400],
+        "max_depth": [None, 5, 10, 15],
+        "min_samples_split": [2, 5],
+        "max_features": ["sqrt", "log2"],
+    }
+    rf_param_combos = [
+        {**rf_fixed, **p} for p in generate_param_grid(rf_grid)
+    ]
+    # 4 * 4 * 2 * 2 = 64 runs
+
+    # ----- Gradient Boosting -----
+    gb_fixed = {
+        "subsample": 1.0,
+    }
+    gb_grid = {
+        "n_estimators": [50, 100, 150],
+        "learning_rate": [0.05, 0.1, 0.2],
+        "max_depth": [2, 3],
+    }
+    gb_param_combos = [
+        {**gb_fixed, **p} for p in generate_param_grid(gb_grid)
+    ]
+    # 3 * 3 * 2 = 18 runs
+
+    # ===============================
+    # 2) Boucle sur tous les modèles
+    # ===============================
+    print("🚀 Lancement des expérimentations MLflow...")
+
+    total_runs = 0
+
+    # LogReg
+    for params in logreg_param_combos:
+        train_one_run("logreg", params)
+        total_runs += 1
+
+    # Random Forest
+    for params in rf_param_combos:
+        train_one_run("random_forest", params)
+        total_runs += 1
+
+    # Gradient Boosting
+    for params in gb_param_combos:
+        train_one_run("gradient_boosting", params)
+        total_runs += 1
+
+    print(f"✅ Expérimentations terminées. Nombre total de runs : {total_runs}")
+
+
+if __name__ == "__main__":
+    run_experiments()
+
+
+####################################################
+=== NOM DU FICHIER : ./mlflow/select_best.py ===
+####################################################
+
+import os
+import json
+import mlflow
+import mlflow.sklearn
+
+EXPERIMENT_NAME = "breast_cancer_multi_models"
+EXPORT_PATH = os.path.join("..", "api", "model")  # api/model/
+
+
+def get_best_run():
+    """
+    Récupère le meilleur run de l’expérience selon la métrique val_accuracy.
+    """
+    experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)
+    if experiment is None:
+        raise ValueError(
+            f"L’expérience MLflow '{EXPERIMENT_NAME}' n’existe pas. "
+            f"Lance d’abord train.py pour générer des runs."
+        )
+
+    # Tous les runs triés par val_accuracy décroissante
+    runs = mlflow.search_runs(
+        experiment_ids=[experiment.experiment_id],
+        order_by=["metrics.val_accuracy DESC"]
+    )
+
+    if runs.empty:
+        raise ValueError("Aucun run trouvé pour cette expérience.")
+
+    return runs.iloc[0]
+
+
+def export_best_model():
+    """
+    Charge le meilleur modèle via MLflow et l’exporte dans ../api/model.
+    Écrit aussi un fichier metadata.json avec run_id, accuracy, etc.
+    """
+    best_run = get_best_run()
+    best_run_id = best_run.run_id
+    best_accuracy = best_run["metrics.val_accuracy"]
+    best_model_name = best_run["params.model_name"]
+
+    print("🏆 Meilleur run trouvé :")
+    print(f"   - run_id       = {best_run_id}")
+    print(f"   - model_name   = {best_model_name}")
+    print(f"   - val_accuracy = {best_accuracy:.4f}")
+
+    # Chemin MLflow pour le modèle logué dans train.py
+    model_uri = f"runs:/{best_run_id}/model"
+
+    # On charge le modèle
+    model = mlflow.sklearn.load_model(model_uri)
+
+    # On s’assure que le dossier d’export existe
+    os.makedirs(EXPORT_PATH, exist_ok=True)
+
+    # On exporte le modèle au format MLflow dans api/model
+    mlflow.sklearn.save_model(model, path=EXPORT_PATH)
+    print(f"📦 Modèle exporté au format MLflow dans : {EXPORT_PATH}")
+
+    # Fichier metadata.json
+    metadata = {
+        "best_run_id": best_run_id,
+        "val_accuracy": float(best_accuracy),
+        "experiment_name": EXPERIMENT_NAME,
+        "model_name": best_model_name,
+    }
+    metadata_path = os.path.join(EXPORT_PATH, "metadata.json")
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+
+    print(f"📝 Metadata enregistrée dans : {metadata_path}")
+
+
+if __name__ == "__main__":
+    export_best_model()

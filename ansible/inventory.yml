@@ -1,0 +1,11 @@
+api:
+  hosts:
+    13.39.17.68:
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ./id_rsa.pem
+
+monitoring:
+  hosts:
+    35.180.156.63:
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ./id_rsa.pem

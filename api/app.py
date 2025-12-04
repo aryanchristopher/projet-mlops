@@ -31,9 +31,7 @@ PREDICTION_LATENCY = Histogram(
 
 
 class InputData(BaseModel):
-    x1: float
-    x2: float
-    x3: float
+    features: list[float]  # On attend une liste de 30 valeurs
 
 
 @app.get("/health")
@@ -51,7 +49,7 @@ def predict(data: InputData):
 
     # Mesurer la latence de la prédiction
     with PREDICTION_LATENCY.time():
-        features = [[data.x1, data.x2, data.x3]]
+        features = [data.features]
 
         # Fallback si pas de modèle réel
         if model is None:

@@ -7,10 +7,10 @@
       - curl
       - gnupg
       - lsb-release
-      - python3-pip
+      - python3-pip # Nécessaire pour installer le module docker python
 
   tasks:
-    # --- INSTALLATION DOCKER ---
+    # --- PARTIE 1 : INSTALLATION DOCKER (Comme avant) ---
     - name: 1. Mise à jour cache APT
       apt:
         update_cache: yes
@@ -22,65 +22,82 @@
         state: present
       loop: "{{ docker_packages }}"
 
-    - name: 3. Clé GPG Docker
+    - name: 3. Dossier clé GPG
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: 4. Clé GPG Docker
       shell: |
-        install -m 0755 -d /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
       args:
         creates: /etc/apt/keyrings/docker.gpg
 
-    - name: 4. Dépôt Docker
+    - name: 5. Dépôt Docker
       shell: |
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    - name: 5. Install Docker Engine
+    - name: 6. Install Docker Engine
       apt:
         update_cache: yes
-        name: [docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin]
-        state: present
-
-    - name: 6. User ubuntu dans groupe docker
-      user:
-        name: ubuntu
-        groups: docker
-        append: yes
-
-    # --- FIX CRITIQUE PYTHON / DOCKER ---
-    - name: 7. Installation Librairie Docker pour Python (FIX COMPATIBILITÉ)
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+- name: 8. Installation Librairie Docker pour Python (FIX COMPATIBILITÉ)
       pip:
         name:
           - docker==6.1.3
           - urllib3==1.26.15
           - requests==2.28.2
         executable: pip3
-        state: forcereinstall
+        state: force_reinstall        state: present
 
-    # --- CONFIGURATION & LANCEMENT ---
-    - name: 8. Créer dossier config Prometheus
+    - name: 7. User ubuntu dans groupe docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    # --- PARTIE 2 : CONFIG PYTHON (Nécessaire pour Ansible Docker) ---
+    - name: 8. Installation Librairie Docker pour Python
+      pip:
+        name: 
+          - docker
+          - urllib3<2.0 # Hack pour compatibilité
+        executable: pip3
+
+    # --- PARTIE 3 : CONFIGURATION & LANCEMENT ---
+    - name: 9. Créer dossier config Prometheus
       file:
         path: /etc/prometheus
         state: directory
         mode: '0755'
 
-    - name: 9. Copier le fichier de config (AVEC PERMISSIONS FIXÉES)
+    - name: 10. Copier le fichier de config
       copy:
         src: ../monitoring/prometheus.yml
         dest: /etc/prometheus/prometheus.yml
-        mode: '0644'  # <-- C'est ça qui va réparer ton erreur de chargement
 
-    - name: 10. Lancer Prometheus
+    - name: 11. Lancer Prometheus (Port 9090)
       docker_container:
         name: prometheus
         image: prom/prometheus
         state: started
         restart_policy: always
-        ports: ["9090:9090"]
-        volumes: ["/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"]
+        ports:
+          - "9090:9090"
+        volumes:
+          - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
-    - name: 11. Lancer Grafana
+    - name: 12. Lancer Grafana (Port 3000)
       docker_container:
         name: grafana
         image: grafana/grafana
         state: started
         restart_policy: always
-        ports: ["3000:3000"]
+        ports:
+          - "3000:3000"

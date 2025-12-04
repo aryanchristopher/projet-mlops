@@ -2,6 +2,7 @@ import os
 import json
 import mlflow
 import mlflow.sklearn
+import joblib
 
 EXPERIMENT_NAME = "breast_cancer_multi_models"
 EXPORT_PATH = os.path.join("..", "api", "model")  # api/model/
@@ -54,9 +55,10 @@ def export_best_model():
     # On s’assure que le dossier d’export existe
     os.makedirs(EXPORT_PATH, exist_ok=True)
 
-    # On exporte le modèle au format MLflow dans api/model
-    mlflow.sklearn.save_model(model, path=EXPORT_PATH)
-    print(f"📦 Modèle exporté au format MLflow dans : {EXPORT_PATH}")
+    # On exporte directement en .pkl car l'API utilise joblib
+    model_file = os.path.join(EXPORT_PATH, "model.pkl")
+    joblib.dump(model, model_file)
+    print(f"📦 Modèle exporté (format joblib) dans : {model_file}")
 
     # Fichier metadata.json
     metadata = {
