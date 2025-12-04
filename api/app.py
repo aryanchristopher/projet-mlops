@@ -27,7 +27,7 @@ class InputData(BaseModel):
 @app.get("/health")
 def health():
     return {
-        "status": "ok",
+        "status": "healthy",
         "model_loaded": model is not None
     }
 
@@ -36,7 +36,7 @@ def health():
 def predict(data: InputData):
     features = [[data.x1, data.x2, data.x3]]
 
-    # Si modèle réel indisponible → fallback dummy
+    # Fallback si pas de modèle réel
     if model is None:
         score = data.x1 * 0.5 + data.x2 * 0.3 + data.x3 * 0.2
         return {
@@ -44,7 +44,7 @@ def predict(data: InputData):
             "model": "dummy"
         }
 
-    # Si modèle présent → prédiction réelle
+    # Si modèle réel dispo
     pred = model.predict(features)[0]
     return {
         "prediction": float(pred),
