@@ -1,0 +1,12 @@
+global:
+  [cite_start]scrape_interval: 15s # Scrape toutes les 15 secondes [cite: 70]
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'api_mlops'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['35.180.31.250:5000'] # L'adresse IP de ton serveur API
