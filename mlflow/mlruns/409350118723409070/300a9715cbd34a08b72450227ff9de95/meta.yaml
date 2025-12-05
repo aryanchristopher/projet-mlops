@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/300a9715cbd34a08b72450227ff9de95/artifacts
+end_time: 1764894652060
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 300a9715cbd34a08b72450227ff9de95
+run_name: learned-newt-462
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894650048
+status: 3
+tags: []
+user_id: aryan

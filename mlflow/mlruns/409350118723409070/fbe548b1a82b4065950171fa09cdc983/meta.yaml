@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/fbe548b1a82b4065950171fa09cdc983/artifacts
+end_time: 1764894650039
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: fbe548b1a82b4065950171fa09cdc983
+run_name: caring-toad-430
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894647971
+status: 3
+tags: []
+user_id: aryan

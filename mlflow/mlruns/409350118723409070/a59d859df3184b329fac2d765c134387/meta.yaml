@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/a59d859df3184b329fac2d765c134387/artifacts
+end_time: 1764894118603
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: a59d859df3184b329fac2d765c134387
+run_name: able-shrew-153
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894116691
+status: 3
+tags: []
+user_id: aryan

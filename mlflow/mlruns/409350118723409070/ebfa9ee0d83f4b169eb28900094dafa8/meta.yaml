@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/ebfa9ee0d83f4b169eb28900094dafa8/artifacts
+end_time: 1764894673743
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: ebfa9ee0d83f4b169eb28900094dafa8
+run_name: trusting-snake-419
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894671731
+status: 3
+tags: []
+user_id: aryan

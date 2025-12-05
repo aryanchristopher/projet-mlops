@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/ffe7ad39b1da4dd0b760a9dbf8ec710c/artifacts
+end_time: 1764894210167
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: ffe7ad39b1da4dd0b760a9dbf8ec710c
+run_name: clumsy-squirrel-304
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894207892
+status: 3
+tags: []
+user_id: aryan

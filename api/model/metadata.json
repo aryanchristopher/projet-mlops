@@ -1,0 +1,6 @@
+{
+  "best_run_id": "11b8258be0d845fe9af9844c88725959",
+  "val_accuracy": 0.9736842105263158,
+  "experiment_name": "breast_cancer_multi_models",
+  "model_name": "logreg"
+}

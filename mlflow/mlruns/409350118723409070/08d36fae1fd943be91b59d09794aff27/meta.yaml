@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/08d36fae1fd943be91b59d09794aff27/artifacts
+end_time: 1764894067221
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 08d36fae1fd943be91b59d09794aff27
+run_name: nimble-finch-841
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894065468
+status: 3
+tags: []
+user_id: aryan

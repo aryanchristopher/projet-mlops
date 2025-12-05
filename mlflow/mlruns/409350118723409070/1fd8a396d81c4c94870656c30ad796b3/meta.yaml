@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/1fd8a396d81c4c94870656c30ad796b3/artifacts
+end_time: 1764894141512
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 1fd8a396d81c4c94870656c30ad796b3
+run_name: brawny-wasp-473
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894139476
+status: 3
+tags: []
+user_id: aryan

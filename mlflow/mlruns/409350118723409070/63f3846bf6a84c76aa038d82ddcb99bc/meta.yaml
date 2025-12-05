@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/63f3846bf6a84c76aa038d82ddcb99bc/artifacts
+end_time: 1764894229469
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 63f3846bf6a84c76aa038d82ddcb99bc
+run_name: spiffy-hound-655
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894225165
+status: 3
+tags: []
+user_id: aryan

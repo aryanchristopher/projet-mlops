@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/346b114991dc426887c75afa02fef6dc/artifacts
+end_time: 1764894724773
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 346b114991dc426887c75afa02fef6dc
+run_name: luminous-deer-762
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894722694
+status: 3
+tags: []
+user_id: aryan

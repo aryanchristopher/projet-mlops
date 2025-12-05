@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/d8e574cc6cbb44aca59ec7feb4d1aaf4/artifacts
+end_time: 1764894757196
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: d8e574cc6cbb44aca59ec7feb4d1aaf4
+run_name: gifted-shoat-231
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894754802
+status: 3
+tags: []
+user_id: aryan

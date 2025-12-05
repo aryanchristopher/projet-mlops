@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/73d30b9929334f65a3ac60bf583b7dab/artifacts
+end_time: 1764894112804
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 73d30b9929334f65a3ac60bf583b7dab
+run_name: powerful-tern-454
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894110862
+status: 3
+tags: []
+user_id: aryan

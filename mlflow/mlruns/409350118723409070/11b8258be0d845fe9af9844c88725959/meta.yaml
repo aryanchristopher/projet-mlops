@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/11b8258be0d845fe9af9844c88725959/artifacts
+end_time: 1764894643889
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 11b8258be0d845fe9af9844c88725959
+run_name: capable-carp-857
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894641891
+status: 3
+tags: []
+user_id: aryan

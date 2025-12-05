@@ -1,0 +1,6 @@
+artifact_location: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070
+creation_time: 1764894059146
+experiment_id: '409350118723409070'
+last_update_time: 1764894059146
+lifecycle_stage: active
+name: breast_cancer_multi_models

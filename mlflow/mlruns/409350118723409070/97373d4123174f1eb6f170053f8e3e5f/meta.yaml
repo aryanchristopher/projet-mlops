@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/97373d4123174f1eb6f170053f8e3e5f/artifacts
+end_time: 1764894087927
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 97373d4123174f1eb6f170053f8e3e5f
+run_name: sedate-turtle-877
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894086016
+status: 3
+tags: []
+user_id: aryan

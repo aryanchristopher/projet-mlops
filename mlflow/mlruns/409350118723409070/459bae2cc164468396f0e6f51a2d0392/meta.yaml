@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/459bae2cc164468396f0e6f51a2d0392/artifacts
+end_time: 1764894188428
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 459bae2cc164468396f0e6f51a2d0392
+run_name: crawling-sloth-409
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894186355
+status: 3
+tags: []
+user_id: aryan

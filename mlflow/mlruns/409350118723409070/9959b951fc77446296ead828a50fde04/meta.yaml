@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/9959b951fc77446296ead828a50fde04/artifacts
+end_time: 1764894268682
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 9959b951fc77446296ead828a50fde04
+run_name: fearless-elk-811
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894266476
+status: 3
+tags: []
+user_id: aryan

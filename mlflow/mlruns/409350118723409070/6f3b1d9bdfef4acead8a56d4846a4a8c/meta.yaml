@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/6f3b1d9bdfef4acead8a56d4846a4a8c/artifacts
+end_time: 1764894283617
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 6f3b1d9bdfef4acead8a56d4846a4a8c
+run_name: adaptable-moose-922
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894281136
+status: 3
+tags: []
+user_id: aryan

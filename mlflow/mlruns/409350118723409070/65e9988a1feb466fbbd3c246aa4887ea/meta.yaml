@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/65e9988a1feb466fbbd3c246aa4887ea/artifacts
+end_time: 1764894261600
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 65e9988a1feb466fbbd3c246aa4887ea
+run_name: wistful-sheep-968
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894257618
+status: 3
+tags: []
+user_id: aryan

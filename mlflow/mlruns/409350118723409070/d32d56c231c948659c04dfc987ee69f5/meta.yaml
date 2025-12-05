@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/d32d56c231c948659c04dfc987ee69f5/artifacts
+end_time: 1764894108850
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: d32d56c231c948659c04dfc987ee69f5
+run_name: indecisive-hound-361
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894106825
+status: 3
+tags: []
+user_id: aryan

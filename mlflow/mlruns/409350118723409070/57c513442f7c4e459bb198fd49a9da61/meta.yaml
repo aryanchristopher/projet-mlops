@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/57c513442f7c4e459bb198fd49a9da61/artifacts
+end_time: 1764894820384
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 57c513442f7c4e459bb198fd49a9da61
+run_name: classy-sloth-923
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894818057
+status: 3
+tags: []
+user_id: aryan

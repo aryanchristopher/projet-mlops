@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/f818d5184f824c36b5c0ad710b1362be/artifacts
+end_time: 1764894217205
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: f818d5184f824c36b5c0ad710b1362be
+run_name: omniscient-tern-564
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894214755
+status: 3
+tags: []
+user_id: aryan

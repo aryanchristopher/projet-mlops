@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/c04c03d8ce08472182015e18282d2ee0/artifacts
+end_time: 1764894082155
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: c04c03d8ce08472182015e18282d2ee0
+run_name: resilient-bird-803
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894080304
+status: 3
+tags: []
+user_id: aryan

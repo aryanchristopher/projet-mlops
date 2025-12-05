@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/27509de45a3148da8f54a4b44f7227a3/artifacts
+end_time: 1764894165438
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 27509de45a3148da8f54a4b44f7227a3
+run_name: placid-loon-966
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894163441
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/6e43b45b30dd4ac089f49f0ce3ef9855/artifacts
+end_time: 1764894149692
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 6e43b45b30dd4ac089f49f0ce3ef9855
+run_name: sedate-yak-669
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894147631
+status: 3
+tags: []
+user_id: aryan

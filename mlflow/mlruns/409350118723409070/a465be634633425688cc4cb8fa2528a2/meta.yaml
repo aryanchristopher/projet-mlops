@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/a465be634633425688cc4cb8fa2528a2/artifacts
+end_time: 1764894741162
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: a465be634633425688cc4cb8fa2528a2
+run_name: judicious-skunk-840
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894739046
+status: 3
+tags: []
+user_id: aryan

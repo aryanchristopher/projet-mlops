@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/c6378b1b3b7146b9a1cc1f9fdd2614a8/artifacts
+end_time: 1764894153750
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: c6378b1b3b7146b9a1cc1f9fdd2614a8
+run_name: dapper-toad-227
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894151770
+status: 3
+tags: []
+user_id: aryan

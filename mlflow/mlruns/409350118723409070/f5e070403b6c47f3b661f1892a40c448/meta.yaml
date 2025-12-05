@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/f5e070403b6c47f3b661f1892a40c448/artifacts
+end_time: 1764894768312
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: f5e070403b6c47f3b661f1892a40c448
+run_name: amazing-kit-97
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894764789
+status: 3
+tags: []
+user_id: aryan

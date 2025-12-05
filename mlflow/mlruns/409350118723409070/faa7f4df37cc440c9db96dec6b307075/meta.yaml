@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/faa7f4df37cc440c9db96dec6b307075/artifacts
+end_time: 1764894281127
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: faa7f4df37cc440c9db96dec6b307075
+run_name: loud-wren-63
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894278424
+status: 3
+tags: []
+user_id: aryan

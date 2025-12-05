@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/1929a7aa03234e7f9704ae6a8dfe6216/artifacts
+end_time: 1764894825364
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 1929a7aa03234e7f9704ae6a8dfe6216
+run_name: kindly-turtle-760
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894823006
+status: 3
+tags: []
+user_id: aryan

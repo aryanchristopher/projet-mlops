@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/bc13b528aab64a138140e06c89676f0d/artifacts
+end_time: 1764894818049
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: bc13b528aab64a138140e06c89676f0d
+run_name: melodic-mule-860
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894815608
+status: 3
+tags: []
+user_id: aryan

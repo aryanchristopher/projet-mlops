@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/a5e1a11367454cdbb755096886a37380/artifacts
+end_time: 1764894212378
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: a5e1a11367454cdbb755096886a37380
+run_name: defiant-squid-468
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894210174
+status: 3
+tags: []
+user_id: aryan

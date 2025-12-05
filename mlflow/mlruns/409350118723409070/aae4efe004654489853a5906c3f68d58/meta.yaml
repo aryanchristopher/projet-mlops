@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/aae4efe004654489853a5906c3f68d58/artifacts
+end_time: 1764894137456
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: aae4efe004654489853a5906c3f68d58
+run_name: fearless-vole-906
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894135545
+status: 3
+tags: []
+user_id: aryan

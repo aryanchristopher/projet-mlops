@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/b12bc1e0a3b844d581618dee8cd1e690/artifacts
+end_time: 1764894823000
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: b12bc1e0a3b844d581618dee8cd1e690
+run_name: unruly-deer-286
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894820390
+status: 3
+tags: []
+user_id: aryan

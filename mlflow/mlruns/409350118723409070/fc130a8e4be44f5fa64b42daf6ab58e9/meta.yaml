@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/fc130a8e4be44f5fa64b42daf6ab58e9/artifacts
+end_time: 1764894631910
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: fc130a8e4be44f5fa64b42daf6ab58e9
+run_name: bouncy-gnat-107
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894628530
+status: 3
+tags: []
+user_id: aryan

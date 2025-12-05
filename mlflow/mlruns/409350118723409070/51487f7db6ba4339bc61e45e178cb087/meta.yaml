@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/51487f7db6ba4339bc61e45e178cb087/artifacts
+end_time: 1764894102799
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 51487f7db6ba4339bc61e45e178cb087
+run_name: calm-panda-703
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894100968
+status: 3
+tags: []
+user_id: aryan

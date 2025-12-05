@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/4b734611b4bd4ea38f946cb7bbf252bb/artifacts
+end_time: 1764894161411
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 4b734611b4bd4ea38f946cb7bbf252bb
+run_name: wistful-shrimp-918
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894157841
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/d883e740b8f54b79b36b548a0de6226a/artifacts
+end_time: 1764894614699
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: d883e740b8f54b79b36b548a0de6226a
+run_name: nebulous-penguin-175
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894612832
+status: 3
+tags: []
+user_id: aryan

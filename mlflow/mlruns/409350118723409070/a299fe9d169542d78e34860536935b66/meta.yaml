@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/a299fe9d169542d78e34860536935b66/artifacts
+end_time: 1764894675719
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: a299fe9d169542d78e34860536935b66
+run_name: learned-sloth-635
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894673750
+status: 3
+tags: []
+user_id: aryan

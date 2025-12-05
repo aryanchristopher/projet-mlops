@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/3887c658a4ba4580bc04e2d700a66b97/artifacts
+end_time: 1764894116684
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 3887c658a4ba4580bc04e2d700a66b97
+run_name: skillful-dolphin-254
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894114724
+status: 3
+tags: []
+user_id: aryan

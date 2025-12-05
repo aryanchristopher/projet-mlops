@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/4c03a262889c4203b4358f266432c6be/artifacts
+end_time: 1764894114718
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 4c03a262889c4203b4358f266432c6be
+run_name: clumsy-shad-89
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894112811
+status: 3
+tags: []
+user_id: aryan

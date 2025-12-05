@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/07c80a088d2043be94dfc40b57b4c2c4/artifacts
+end_time: 1764894671724
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 07c80a088d2043be94dfc40b57b4c2c4
+run_name: suave-snail-910
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894669835
+status: 3
+tags: []
+user_id: aryan

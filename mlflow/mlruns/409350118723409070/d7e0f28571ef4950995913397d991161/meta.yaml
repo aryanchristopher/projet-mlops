@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/d7e0f28571ef4950995913397d991161/artifacts
+end_time: 1764894122451
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: d7e0f28571ef4950995913397d991161
+run_name: exultant-snake-315
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894120557
+status: 3
+tags: []
+user_id: aryan

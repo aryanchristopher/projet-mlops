@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/db8820f35aac4110a4e9ed2941c9c8f5/artifacts
+end_time: 1764894145589
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: db8820f35aac4110a4e9ed2941c9c8f5
+run_name: adorable-finch-681
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894143530
+status: 3
+tags: []
+user_id: aryan

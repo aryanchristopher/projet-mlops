@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/9404caf49caf4a05bf58842e3db4e023/artifacts
+end_time: 1764894704187
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 9404caf49caf4a05bf58842e3db4e023
+run_name: defiant-doe-9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894702153
+status: 3
+tags: []
+user_id: aryan

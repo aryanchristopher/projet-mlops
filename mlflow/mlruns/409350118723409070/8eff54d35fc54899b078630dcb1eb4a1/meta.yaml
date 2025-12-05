@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/8eff54d35fc54899b078630dcb1eb4a1/artifacts
+end_time: 1764894151763
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 8eff54d35fc54899b078630dcb1eb4a1
+run_name: angry-bear-737
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894149698
+status: 3
+tags: []
+user_id: aryan

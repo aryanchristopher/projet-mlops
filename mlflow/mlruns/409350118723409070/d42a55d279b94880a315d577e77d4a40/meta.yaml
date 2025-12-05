@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/d42a55d279b94880a315d577e77d4a40/artifacts
+end_time: 1764894656029
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: d42a55d279b94880a315d577e77d4a40
+run_name: capable-toad-504
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894654069
+status: 3
+tags: []
+user_id: aryan

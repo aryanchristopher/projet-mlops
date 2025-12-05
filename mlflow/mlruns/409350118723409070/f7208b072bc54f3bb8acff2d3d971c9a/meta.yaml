@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/f7208b072bc54f3bb8acff2d3d971c9a/artifacts
+end_time: 1764894626569
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: f7208b072bc54f3bb8acff2d3d971c9a
+run_name: omniscient-bug-458
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894624623
+status: 3
+tags: []
+user_id: aryan

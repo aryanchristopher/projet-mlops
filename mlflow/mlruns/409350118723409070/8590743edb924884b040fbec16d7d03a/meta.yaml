@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/8590743edb924884b040fbec16d7d03a/artifacts
+end_time: 1764894198433
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 8590743edb924884b040fbec16d7d03a
+run_name: glamorous-trout-35
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894196191
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/08eedcbcee5e4c5882a475f4118478d6/artifacts
+end_time: 1764894175964
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 08eedcbcee5e4c5882a475f4118478d6
+run_name: dazzling-cow-118
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894173908
+status: 3
+tags: []
+user_id: aryan

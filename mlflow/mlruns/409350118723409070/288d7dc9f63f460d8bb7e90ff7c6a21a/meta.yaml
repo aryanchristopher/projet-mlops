@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/288d7dc9f63f460d8bb7e90ff7c6a21a/artifacts
+end_time: 1764894610965
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 288d7dc9f63f460d8bb7e90ff7c6a21a
+run_name: sedate-shrike-328
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894609039
+status: 3
+tags: []
+user_id: aryan

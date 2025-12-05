@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/f7c18e8f72044f6189fae979c9d6fe65/artifacts
+end_time: 1764894789952
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: f7c18e8f72044f6189fae979c9d6fe65
+run_name: stately-stag-724
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894787529
+status: 3
+tags: []
+user_id: aryan

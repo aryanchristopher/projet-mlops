@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/0340089ce7cb40b1aacd9f625b14a7f8/artifacts
+end_time: 1764894253236
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 0340089ce7cb40b1aacd9f625b14a7f8
+run_name: lyrical-hare-926
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894251124
+status: 3
+tags: []
+user_id: aryan

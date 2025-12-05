@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/1cb2fcb59300450d9e8b587725619db7/artifacts
+end_time: 1764894240127
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 1cb2fcb59300450d9e8b587725619db7
+run_name: fearless-frog-296
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894237398
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/34d3e9d9a29340e9896706c277664ac7/artifacts
+end_time: 1764894264024
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 34d3e9d9a29340e9896706c277664ac7
+run_name: funny-perch-536
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894261607
+status: 3
+tags: []
+user_id: aryan

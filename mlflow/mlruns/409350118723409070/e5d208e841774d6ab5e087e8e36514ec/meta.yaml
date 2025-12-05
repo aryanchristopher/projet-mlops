@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/e5d208e841774d6ab5e087e8e36514ec/artifacts
+end_time: 1764894684121
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: e5d208e841774d6ab5e087e8e36514ec
+run_name: fortunate-flea-943
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894681936
+status: 3
+tags: []
+user_id: aryan

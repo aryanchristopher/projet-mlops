@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/04e3919d9d9a4b1ba01c0e53c1e08bef/artifacts
+end_time: 1764894143524
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 04e3919d9d9a4b1ba01c0e53c1e08bef
+run_name: awesome-crab-631
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894141518
+status: 3
+tags: []
+user_id: aryan

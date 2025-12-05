@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/8dd9f463a6a64e54a28d6e1437ad0720/artifacts
+end_time: 1764894222428
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 8dd9f463a6a64e54a28d6e1437ad0720
+run_name: adaptable-moth-139
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894219679
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/d3173a58475d4c19882e20df156e34a0/artifacts
+end_time: 1764894667729
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: d3173a58475d4c19882e20df156e34a0
+run_name: zealous-mink-679
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894665588
+status: 3
+tags: []
+user_id: aryan

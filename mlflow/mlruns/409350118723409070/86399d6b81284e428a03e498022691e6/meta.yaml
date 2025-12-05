@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/86399d6b81284e428a03e498022691e6/artifacts
+end_time: 1764894759719
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 86399d6b81284e428a03e498022691e6
+run_name: suave-sheep-280
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894757204
+status: 3
+tags: []
+user_id: aryan

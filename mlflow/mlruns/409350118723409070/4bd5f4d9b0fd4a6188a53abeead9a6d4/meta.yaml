@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/4bd5f4d9b0fd4a6188a53abeead9a6d4/artifacts
+end_time: 1764894712593
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 4bd5f4d9b0fd4a6188a53abeead9a6d4
+run_name: clean-stork-600
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894710327
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/f577d7b4cd834ba4842997ec82d4e086/artifacts
+end_time: 1764894810831
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: f577d7b4cd834ba4842997ec82d4e086
+run_name: unleashed-bug-410
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894808611
+status: 3
+tags: []
+user_id: aryan

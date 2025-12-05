@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/410bd77ddb5f4b1788a898da01894868/artifacts
+end_time: 1764894639990
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 410bd77ddb5f4b1788a898da01894868
+run_name: grandiose-jay-352
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894638053
+status: 3
+tags: []
+user_id: aryan

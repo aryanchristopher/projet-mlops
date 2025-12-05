@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/efc1459f6b544221b00657e3a65a6977/artifacts
+end_time: 1764894739039
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: efc1459f6b544221b00657e3a65a6977
+run_name: omniscient-sow-192
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894736955
+status: 3
+tags: []
+user_id: aryan

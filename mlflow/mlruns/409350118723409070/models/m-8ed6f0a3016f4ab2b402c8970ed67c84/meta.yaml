@@ -1,0 +1,10 @@
+artifact_location: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/models/m-8ed6f0a3016f4ab2b402c8970ed67c84/artifacts
+creation_timestamp: 1764894220300
+experiment_id: '409350118723409070'
+last_updated_timestamp: 1764894222426
+model_id: m-8ed6f0a3016f4ab2b402c8970ed67c84
+model_type: null
+name: model
+source_run_id: 8dd9f463a6a64e54a28d6e1437ad0720
+status: 2
+status_message: null

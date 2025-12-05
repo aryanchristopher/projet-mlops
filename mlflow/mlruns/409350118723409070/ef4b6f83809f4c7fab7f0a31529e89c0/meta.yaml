@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/ef4b6f83809f4c7fab7f0a31529e89c0/artifacts
+end_time: 1764894203016
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: ef4b6f83809f4c7fab7f0a31529e89c0
+run_name: redolent-cod-995
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894200580
+status: 3
+tags: []
+user_id: aryan

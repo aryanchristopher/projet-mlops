@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/fd973b94adb84584b2c6f7d3d1269b33/artifacts
+end_time: 1764894665582
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: fd973b94adb84584b2c6f7d3d1269b33
+run_name: resilient-auk-962
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894662084
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/6f7581f3677c4f4cb376d96decb4db17/artifacts
+end_time: 1764894806250
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 6f7581f3677c4f4cb376d96decb4db17
+run_name: fortunate-fawn-565
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894804019
+status: 3
+tags: []
+user_id: aryan

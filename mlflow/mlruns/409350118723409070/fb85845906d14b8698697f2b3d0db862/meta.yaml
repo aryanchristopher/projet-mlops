@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/fb85845906d14b8698697f2b3d0db862/artifacts
+end_time: 1764894620643
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: fb85845906d14b8698697f2b3d0db862
+run_name: painted-squirrel-149
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894618669
+status: 3
+tags: []
+user_id: aryan

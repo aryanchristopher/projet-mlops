@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/44b0944179fe49caaa5c58a623f08e3a/artifacts
+end_time: 1764894232090
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 44b0944179fe49caaa5c58a623f08e3a
+run_name: upset-sow-291
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894229476
+status: 3
+tags: []
+user_id: aryan

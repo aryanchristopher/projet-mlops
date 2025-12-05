@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/8c9d031162634836bcab1f253374fa97/artifacts
+end_time: 1764894173902
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 8c9d031162634836bcab1f253374fa97
+run_name: unequaled-swan-586
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894171843
+status: 3
+tags: []
+user_id: aryan

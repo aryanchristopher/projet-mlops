@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/96f0dd98ea164a5fb13cac4eb89c4a42/artifacts
+end_time: 1764894794130
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 96f0dd98ea164a5fb13cac4eb89c4a42
+run_name: overjoyed-sponge-201
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894792015
+status: 3
+tags: []
+user_id: aryan

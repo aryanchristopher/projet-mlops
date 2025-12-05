@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/6555f6a485154f6ea529f0661ea740d5/artifacts
+end_time: 1764894752295
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 6555f6a485154f6ea529f0661ea740d5
+run_name: rogue-sloth-170
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894749830
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/e404944b156741e2a2986aec662492ef/artifacts
+end_time: 1764894110855
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: e404944b156741e2a2986aec662492ef
+run_name: enchanting-duck-6
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894108857
+status: 3
+tags: []
+user_id: aryan

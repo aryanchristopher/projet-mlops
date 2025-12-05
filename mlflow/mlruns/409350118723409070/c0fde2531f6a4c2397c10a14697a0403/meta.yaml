@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/c0fde2531f6a4c2397c10a14697a0403/artifacts
+end_time: 1764894155783
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: c0fde2531f6a4c2397c10a14697a0403
+run_name: gregarious-doe-561
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894153757
+status: 3
+tags: []
+user_id: aryan

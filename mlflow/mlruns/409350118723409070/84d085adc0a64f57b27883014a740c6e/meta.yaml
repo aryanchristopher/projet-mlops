@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/84d085adc0a64f57b27883014a740c6e/artifacts
+end_time: 1764894095287
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 84d085adc0a64f57b27883014a740c6e
+run_name: adaptable-shrimp-86
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894093309
+status: 3
+tags: []
+user_id: aryan

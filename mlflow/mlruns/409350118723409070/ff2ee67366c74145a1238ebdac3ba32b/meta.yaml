@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/ff2ee67366c74145a1238ebdac3ba32b/artifacts
+end_time: 1764894184170
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: ff2ee67366c74145a1238ebdac3ba32b
+run_name: nebulous-crow-483
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894182082
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/00743d8ddca34468ba04be9e508d0b5b/artifacts
+end_time: 1764894196183
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 00743d8ddca34468ba04be9e508d0b5b
+run_name: carefree-lark-38
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894194056
+status: 3
+tags: []
+user_id: aryan

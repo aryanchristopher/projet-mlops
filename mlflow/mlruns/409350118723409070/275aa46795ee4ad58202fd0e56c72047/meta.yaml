@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/275aa46795ee4ad58202fd0e56c72047/artifacts
+end_time: 1764894658075
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 275aa46795ee4ad58202fd0e56c72047
+run_name: adventurous-gull-687
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894656037
+status: 3
+tags: []
+user_id: aryan

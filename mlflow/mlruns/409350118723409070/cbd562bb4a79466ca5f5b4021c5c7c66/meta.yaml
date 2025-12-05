@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/cbd562bb4a79466ca5f5b4021c5c7c66/artifacts
+end_time: 1764894069120
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: cbd562bb4a79466ca5f5b4021c5c7c66
+run_name: invincible-newt-247
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894067227
+status: 3
+tags: []
+user_id: aryan

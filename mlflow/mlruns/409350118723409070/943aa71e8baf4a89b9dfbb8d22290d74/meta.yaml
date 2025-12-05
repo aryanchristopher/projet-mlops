@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/943aa71e8baf4a89b9dfbb8d22290d74/artifacts
+end_time: 1764894726768
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 943aa71e8baf4a89b9dfbb8d22290d74
+run_name: chill-mink-151
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894724780
+status: 3
+tags: []
+user_id: aryan

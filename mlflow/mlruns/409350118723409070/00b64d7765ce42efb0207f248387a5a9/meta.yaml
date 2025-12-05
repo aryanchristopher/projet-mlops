@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/00b64d7765ce42efb0207f248387a5a9/artifacts
+end_time: 1764894063541
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 00b64d7765ce42efb0207f248387a5a9
+run_name: colorful-dolphin-816
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894061525
+status: 3
+tags: []
+user_id: aryan

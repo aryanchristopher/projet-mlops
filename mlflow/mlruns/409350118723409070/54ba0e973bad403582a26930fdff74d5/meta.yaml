@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/54ba0e973bad403582a26930fdff74d5/artifacts
+end_time: 1764894186347
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 54ba0e973bad403582a26930fdff74d5
+run_name: honorable-gull-509
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894184178
+status: 3
+tags: []
+user_id: aryan

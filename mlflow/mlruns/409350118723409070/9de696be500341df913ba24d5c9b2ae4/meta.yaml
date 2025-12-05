@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/9de696be500341df913ba24d5c9b2ae4/artifacts
+end_time: 1764894686130
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 9de696be500341df913ba24d5c9b2ae4
+run_name: glamorous-stork-627
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894684127
+status: 3
+tags: []
+user_id: aryan

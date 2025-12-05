@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/3e992a3037f646609c9d684dd896c387/artifacts
+end_time: 1764894609033
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 3e992a3037f646609c9d684dd896c387
+run_name: serious-elk-740
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894606983
+status: 3
+tags: []
+user_id: aryan

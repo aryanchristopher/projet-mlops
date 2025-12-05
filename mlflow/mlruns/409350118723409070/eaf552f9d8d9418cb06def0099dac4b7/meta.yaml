@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/eaf552f9d8d9418cb06def0099dac4b7/artifacts
+end_time: 1764894681929
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: eaf552f9d8d9418cb06def0099dac4b7
+run_name: useful-mink-17
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894679741
+status: 3
+tags: []
+user_id: aryan

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/5eb3fb28d9f54fbfbf45824ce54423d7/artifacts
+end_time: 1764894099175
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 5eb3fb28d9f54fbfbf45824ce54423d7
+run_name: gentle-ray-432
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894097245
+status: 3
+tags: []
+user_id: aryan

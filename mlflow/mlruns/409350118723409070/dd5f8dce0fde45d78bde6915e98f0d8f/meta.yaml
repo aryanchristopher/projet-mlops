@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/dd5f8dce0fde45d78bde6915e98f0d8f/artifacts
+end_time: 1764894628523
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: dd5f8dce0fde45d78bde6915e98f0d8f
+run_name: blushing-slug-269
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894626575
+status: 3
+tags: []
+user_id: aryan

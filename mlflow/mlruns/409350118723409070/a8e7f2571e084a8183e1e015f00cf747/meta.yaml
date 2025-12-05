@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/a8e7f2571e084a8183e1e015f00cf747/artifacts
+end_time: 1764894714609
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: a8e7f2571e084a8183e1e015f00cf747
+run_name: awesome-finch-258
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894712601
+status: 3
+tags: []
+user_id: aryan

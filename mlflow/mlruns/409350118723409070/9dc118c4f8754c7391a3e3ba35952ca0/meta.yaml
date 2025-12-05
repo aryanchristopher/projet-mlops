@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/9dc118c4f8754c7391a3e3ba35952ca0/artifacts
+end_time: 1764894654063
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 9dc118c4f8754c7391a3e3ba35952ca0
+run_name: upbeat-toad-52
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894652067
+status: 3
+tags: []
+user_id: aryan

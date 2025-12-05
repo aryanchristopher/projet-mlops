@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/73f08a2846a642419ee5c7229c1638c2/artifacts
+end_time: 1764894773137
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 73f08a2846a642419ee5c7229c1638c2
+run_name: wise-shrimp-729
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894770747
+status: 3
+tags: []
+user_id: aryan

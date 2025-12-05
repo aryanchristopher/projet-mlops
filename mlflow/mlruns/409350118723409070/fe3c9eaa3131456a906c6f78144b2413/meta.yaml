@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/fe3c9eaa3131456a906c6f78144b2413/artifacts
+end_time: 1764894179953
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: fe3c9eaa3131456a906c6f78144b2413
+run_name: handsome-elk-147
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894177906
+status: 3
+tags: []
+user_id: aryan

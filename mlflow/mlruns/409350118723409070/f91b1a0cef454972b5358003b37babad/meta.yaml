@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/f91b1a0cef454972b5358003b37babad/artifacts
+end_time: 1764894106818
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: f91b1a0cef454972b5358003b37babad
+run_name: burly-roo-104
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894104779
+status: 3
+tags: []
+user_id: aryan

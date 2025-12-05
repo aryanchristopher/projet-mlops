@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/1b532fab8bdd449b9660c7209301f791/artifacts
+end_time: 1764894200573
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 1b532fab8bdd449b9660c7209301f791
+run_name: able-mouse-624
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894198439
+status: 3
+tags: []
+user_id: aryan

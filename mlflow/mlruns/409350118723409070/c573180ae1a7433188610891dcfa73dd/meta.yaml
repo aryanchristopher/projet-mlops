@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/c573180ae1a7433188610891dcfa73dd/artifacts
+end_time: 1764894749823
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: c573180ae1a7433188610891dcfa73dd
+run_name: wistful-calf-458
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894747614
+status: 3
+tags: []
+user_id: aryan

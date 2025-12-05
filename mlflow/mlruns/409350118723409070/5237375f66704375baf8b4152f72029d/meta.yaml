@@ -1,0 +1,14 @@
+artifact_uri: file:///home/aryan/projet-mlops/mlflow/mlruns/409350118723409070/5237375f66704375baf8b4152f72029d/artifacts
+end_time: 1764894754795
+entry_point_name: ''
+experiment_id: '409350118723409070'
+lifecycle_stage: active
+run_id: 5237375f66704375baf8b4152f72029d
+run_name: rebellious-ray-983
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764894752302
+status: 3
+tags: []
+user_id: aryan
